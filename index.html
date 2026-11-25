@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Elizabeth Astor — мультики на нейросетях</title>
+    <meta name="description" content="Превращаю твою историю в мультик на нейросетях: для блога, подарка или рекламы. И учу делать такие же." />
+    <meta name="theme-color" content="#17131b" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://elizabeth-astor.github.io/" />
+    <link rel="canonical" href="https://elizabeth-astor.github.io/" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Elizabeth Astor" />
+    <meta property="og:title" content="Elizabeth Astor — мультики на нейросетях" />
+    <meta property="og:description" content="Превращаю твою историю в мультик на нейросетях: для блога, подарка или рекламы. И учу делать такие же." />
+    <meta property="og:image" content="https://elizabeth-astor.github.io/assets/liza-portrait.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      /* Fonts are self-hosted (OFL, see assets/fonts/OFL.txt): nothing is requested from Google or a CDN.
+   Rubik ships as one variable file per script and is the only typeface on the page. */
+      @font-face {
+        font-family: 'Rubik';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url(assets/fonts/rubik-latin.woff2) format('woff2');
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'Rubik';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url(assets/fonts/rubik-cyrillic.woff2) format('woff2');
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+
+      /* ══ Layer 1 · Primitives — the portfolio's own values (portfolio/site/css/site.css), mode-invariant.
+   Every neutral is clean (R = G = B); warmth comes from the paper, the photo and the light, never
+   from a tinted grey ══ */
+      :root {
+        /* Elizabeth's copy of Tigran's page (2026-11-19): his layout, her colours. Tiko asked for a lilac accent
+     and soft, feminine colours, so the graphite leans slightly violet and the coral became lilac */
+        --ink-950: #110e14;
+        --ink-900: #17131b;
+        --ink-800: #211c27;
+        --paper-50: #f6f1f8;
+        --coral-500: #cfaef7; /* the name stays so every rule below keeps working: this is lilac */
+        --white: #ffffff;
+        /* alpha ramps: ink on paper, white on ink (the portfolio's --k-* and --w-*) */
+        --k-04: rgb(17 14 20 / 0.04);
+        --k-06: rgb(13 13 13 / 0.06);
+        --k-10: rgb(13 13 13 / 0.1);
+        --k-14: rgb(13 13 13 / 0.14);
+        --w-06: rgb(255 255 255 / 0.06);
+        --w-08: rgb(255 255 255 / 0.08);
+        --w-14: rgb(255 255 255 / 0.14);
+
+        /* one size scale for space, radius, controls and icons */
+        --s-1: 1px;
+        --s-2: 2px;
+        --s-4: 4px;
+        --s-8: 8px;
+        --s-10: 10px;
+        --s-12: 12px;
+        --s-16: 16px;
+        --s-20: 20px;
+        --s-24: 24px;
+        --s-32: 32px;
+        --s-40: 40px;
+        --s-48: 48px;
+        --s-56: 56px;
+        --s-64: 64px;
+        --s-80: 80px;
+        --s-96: 96px;
+        --s-256: 256px;
+        --s-288: 288px;
+        --s-384: 384px;
+        /* layout measures: the text column, the single-column plate, the photo's widest render
+     (520 × 2 = 1040 ≤ the file's 1125 — never upscaled on a 2× screen) */
+        --s-480: 480px;
+        --s-520: 520px;
+        --r-full: 999px;
+
+        /* type: size and line-height as pairs on the 4-px grid */
+        --f-12: 12px;
+        --lh-16: 16px;
+        --f-14: 14px;
+        --lh-20: 20px;
+        --f-16: 16px;
+        --lh-24: 24px;
+        --f-20: 20px;
+        --lh-28: 28px;
+        --f-28: 28px;
+        --lh-36: 36px;
+        --f-40: 40px;
+        --lh-44: 44px;
+        --f-56: 56px;
+        --lh-60: 60px;
+        --fw-regular: 400;
+        --fw-medium: 500;
+        --fw-semibold: 600;
+
+        /* motion — design-token-architecture scale; the curve follows the PROPERTY */
+        --duration-fast: 100ms;
+        --duration-base: 200ms;
+        --duration-slow: 300ms;
+        --duration-slower: 500ms;
+        --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+        --easing-decelerate: cubic-bezier(0, 0, 0, 1);
+        --easing-opacity: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ══ Layer 2 · Semantics · «soft dark» — Tiko chose it over the warm light variant on 2026-09-26
+   (the light one is in git history, commit 9a3ff5f).
+   Graphite page (never pure black), surfaces one step lighter, paper-white text, coral for the one
+   action. Warmth lives in the light — a faint coral glow behind the photo — never in a tinted grey ══ */
+      :root {
+        --color-bg-page: var(--ink-900);
+        --color-bg-surface: var(--ink-800);
+        --color-bg-surface-hover: color-mix(in srgb, var(--ink-800) 94%, var(--white));
+        --color-bg-cta: var(--coral-500);
+        --color-bg-cta-flood: var(--paper-50);
+        --color-bg-round-hover: var(--w-06);
+        --color-bg-photo: var(--ink-800); /* the frame shows this until the photo arrives */
+        --color-content-primary: var(--paper-50);
+        --color-content-secondary: color-mix(
+          in srgb,
+          var(--paper-50) 66%,
+          transparent
+        ); /* 7:1 on the surface */
+        --color-content-on-cta: var(--ink-950);
+        --color-content-on-flood: var(--ink-950);
+        --color-content-accent: var(--coral-500);
+        --color-border-round: var(--w-14);
+        --color-focus-ring: var(--paper-50);
+        --color-glow: color-mix(
+          in srgb,
+          var(--coral-500) 26%,
+          transparent
+        ); /* warm light behind the photo */
+        --color-border-photo: var(--w-08); /* the photo's dark corners would melt into the page */
+        --shadow-surface: none; /* on graphite, height is a lighter surface, not a shadow */
+        --shadow-photo: none;
+      }
+
+      /* ══ Layer 2 · Semantics: sizes, radii, fonts ══ */
+      :root {
+        --size-focus-ring: var(--s-2);
+        --space-focus-offset: var(--s-4);
+        --size-cta: var(--s-64);
+        --size-row: var(--s-80);
+        --size-avatar: var(--s-48);
+        --size-round: var(--s-56);
+        --size-icon: var(--s-24);
+        --size-card-icon: var(--s-24);
+        --size-logo: var(--s-24);
+        --radius-photo: var(--s-32);
+        --radius-surface: var(--s-24);
+        --radius-pill: var(--r-full);
+        --space-gutter: clamp(var(--s-20), 3.6vw, var(--s-64)); /* the portfolio's --gut */
+        --space-bleed: var(--s-12); /* the photo leaves the text column by 8 px */
+        --space-photo-reserve: var(
+          --s-288
+        ); /* what the name, bio and diary button need under the photo */
+        --space-columns: clamp(var(--s-48), 6vw, var(--s-96));
+        --size-plate: var(--s-520);
+        --size-panel: var(--s-480);
+        --size-photo: clamp(var(--s-384), 36vw, var(--s-520));
+        --font-sans: 'Rubik', 'Helvetica Neue', Arial, sans-serif;
+        --motion-stagger: calc(var(--duration-fast) / 2);
+      }
+
+      /* ══ Base ══ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        background: var(--color-bg-page);
+      }
+      body {
+        min-height: 100vh;
+        min-height: 100svh;
+        background: var(--color-bg-page);
+        color: var(--color-content-primary);
+        font-family: var(--font-sans);
+        font-weight: var(--fw-regular);
+        font-size: var(--f-16);
+        line-height: var(--lh-24);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      a:focus {
+        outline: none;
+      }
+      a:focus-visible {
+        outline: var(--size-focus-ring) solid var(--color-focus-ring);
+        outline-offset: var(--space-focus-offset);
+      }
+      img,
+      svg {
+        display: block;
+      }
+      ul {
+        list-style: none;
+      }
+      b {
+        font-weight: inherit;
+      }
+      .ic {
+        flex: none;
+        width: var(--size-icon);
+        height: var(--size-icon);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* ══ Page. It always spans the window: the glow behind the photo is wider than the column, and the page
+   clips it at the screen edges, never at the column's ══ */
+      .page {
+        overflow-x: hidden;
+        overflow-x: clip;
+        padding-top: var(--space-bleed);
+      }
+
+      /* ══ Hero · S-07 «вылет за сетку»: on a phone the photo leaves the text column and sits 12 px from
+   the screen edges, a soft-cornered print on the paper. Its height gives way on short screens so the
+   diary button always stays on the first screen ══ */
+      .hero {
+        position: relative;
+        isolation: isolate;
+        padding-inline: var(--space-bleed);
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: -20% -30%;
+        pointer-events: none;
+        background: radial-gradient(closest-side, var(--color-glow) 50%, transparent);
+      }
+      .photo {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        aspect-ratio: 4/5;
+        min-height: var(--s-256);
+        max-height: calc(100vh - var(--space-photo-reserve));
+        max-height: calc(100svh - var(--space-photo-reserve));
+        border-radius: var(--radius-photo);
+        background: var(--color-bg-photo);
+        box-shadow: var(--shadow-photo);
+      }
+      .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 50% 30%;
+      }
+      /* the edge of the print, drawn over the photo: invisible on paper, a faint rim on graphite */
+      .photo::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: inset 0 0 0 var(--s-1) var(--color-border-photo);
+      }
+
+      .side {
+        position: relative;
+        z-index: 1;
+        padding: var(--s-24) var(--space-gutter) 0;
+      } /* text always above the glow */
+
+      /* ══ Name and bio · S-18 two-tone line: the role in the primary colour, the facts one step down ══ */
+      .name {
+        font-size: var(--f-40);
+        line-height: var(--lh-44);
+        font-weight: var(--fw-semibold);
+        letter-spacing: -0.02em;
+        word-spacing: 0.04em;
+        text-wrap: balance;
+      }
+      .bio {
+        margin-top: var(--s-8);
+        max-width: 32ch;
+        font-size: var(--f-20);
+        line-height: var(--lh-28);
+        color: var(--color-content-secondary);
+        text-wrap: pretty;
+      }
+      .bio b {
+        color: var(--color-content-primary);
+        font-weight: var(--fw-medium);
+      }
+
+      /* ══ The one coral action: a pill. The portfolio's corner fill (portavia): a dot in the lower-left
+   corner floods the pill; once the flood is complete the pill's own colour follows it ══ */
+      .cta {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s-12);
+        min-height: var(--size-cta);
+        margin-top: var(--s-24);
+        padding: 0 var(--s-20) 0 var(--s-24);
+        border-radius: var(--radius-pill);
+        background: var(--color-bg-cta);
+        color: var(--color-content-on-cta);
+        font-size: var(--f-20);
+        line-height: var(--lh-28);
+        font-weight: var(--fw-medium);
+        letter-spacing: -0.01em;
+        transition:
+          transform var(--duration-fast) var(--easing-standard),
+          background-color 0s,
+          color var(--duration-base) var(--easing-opacity);
+      }
+      .cta::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        left: var(--s-16);
+        bottom: var(--s-16);
+        width: var(--s-16);
+        height: var(--s-16);
+        border-radius: 50%;
+        background: var(--color-bg-cta-flood);
+        transform: scale(0);
+        transition: transform var(--duration-slower) var(--easing-standard);
+      }
+      .cta .ic {
+        stroke-width: 2;
+        transition: transform var(--duration-slow) var(--easing-standard);
+      }
+      .cta:focus-visible::before {
+        transform: scale(64);
+      }
+      .cta:focus-visible {
+        background-color: var(--color-bg-cta-flood);
+        color: var(--color-content-on-flood);
+        transition:
+          transform var(--duration-fast) var(--easing-standard),
+          background-color 0s var(--duration-slower),
+          color var(--duration-base) var(--easing-opacity) var(--duration-fast);
+      }
+      .cta:active {
+        transform: scale(0.98);
+      }
+
+      /* ══ Two chats · S-29 «обещание, которое проверяется на месте»: the bio says «делаю свои продукты»,
+   and right under it sits the product itself, with the avatar Telegram shows for it. The rows are
+   soft surfaces, not ruled lines; the leading circle is who you will be talking to ══ */
+      .links {
+        display: grid;
+        gap: var(--s-12);
+        margin-top: var(--s-12);
+      }
+      .card {
+        position: relative;
+        display: grid;
+        grid-template-columns: var(--size-avatar) minmax(0, 1fr) var(--size-card-icon);
+        align-items: center;
+        column-gap: var(--s-16);
+        min-height: var(--size-row);
+        padding: var(--s-16) var(--s-20) var(--s-16) var(--s-16);
+        border-radius: var(--radius-surface);
+        background: var(--color-bg-surface);
+        box-shadow: var(--shadow-surface);
+        transition:
+          background-color var(--duration-base) var(--easing-opacity),
+          transform var(--duration-fast) var(--easing-standard);
+      }
+      .card__avatar {
+        display: block;
+        width: var(--size-avatar);
+        aspect-ratio: 1;
+      }
+      .card__avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .card__text {
+        display: block;
+        min-width: 0;
+      }
+      .card__title {
+        display: block;
+        font-size: var(--f-16);
+        line-height: var(--lh-24);
+        font-weight: var(--fw-medium);
+        text-wrap: pretty;
+      }
+      .card__note {
+        font-weight: var(--fw-regular);
+        color: var(--color-content-secondary);
+      }
+      .card__meta {
+        display: block;
+        margin-top: var(--s-2);
+        font-size: var(--f-14);
+        line-height: var(--lh-20);
+        color: var(--color-content-secondary);
+      }
+      .card .ic {
+        width: var(--size-card-icon);
+        height: var(--size-card-icon);
+        color: var(--color-content-secondary);
+        transition:
+          color var(--duration-base) var(--easing-opacity),
+          transform var(--duration-slow) var(--easing-standard);
+      }
+      .card:active {
+        transform: scale(0.98);
+      }
+      .card:focus-visible .ic {
+        color: var(--color-content-accent);
+      }
+
+      /* ══ Networks · S-01 «ровный ряд» (its one use on the page): five round buttons in equal cells, the
+   name under each. The ring is the button's edge; the icon sits in air, never on a filled chip ══ */
+      .nets {
+        margin-top: var(--s-32);
+      }
+      .nets__list {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+      .net {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--s-8);
+        padding-block: var(--s-4);
+        color: var(--color-content-secondary);
+        transition: color var(--duration-base) var(--easing-opacity);
+      }
+      .net:focus-visible {
+        outline: none;
+      }
+      .net:focus-visible .net__disc {
+        outline: var(--size-focus-ring) solid var(--color-focus-ring);
+        outline-offset: var(--s-4);
+      }
+      .net__disc {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: var(--size-round);
+        height: var(--size-round);
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 var(--s-1) var(--color-border-round);
+        color: var(--color-content-primary);
+        transition:
+          background-color var(--duration-base) var(--easing-opacity),
+          transform var(--duration-fast) var(--easing-standard);
+      }
+      .net__disc svg {
+        width: var(--size-logo);
+        height: var(--size-logo);
+        fill: currentColor;
+      }
+      .net__label {
+        font-size: var(--f-12);
+        line-height: var(--lh-16);
+        white-space: nowrap;
+      }
+      .net:active .net__disc {
+        transform: scale(0.94);
+      }
+
+      /* ══ Footer: the legal note and the year, plain text ══ */
+      .foot {
+        padding: var(--s-40) 0 calc(var(--s-32) + env(safe-area-inset-bottom, 0px));
+        font-size: var(--f-12);
+        line-height: var(--lh-16);
+        color: var(--color-content-secondary);
+      }
+      .foot__note {
+        max-width: 44ch;
+        line-height: var(--lh-20);
+        text-wrap: pretty;
+      }
+      .foot__copy {
+        margin-top: var(--s-8);
+        line-height: var(--lh-20);
+      }
+
+      /* ══ Hover lives only where there is a pointer, and always pairs with keyboard focus ══ */
+      @media (hover: hover) and (pointer: fine) {
+        .cta:hover::before {
+          transform: scale(64);
+        }
+        .cta:hover {
+          background-color: var(--color-bg-cta-flood);
+          color: var(--color-content-on-flood);
+          transition:
+            transform var(--duration-fast) var(--easing-standard),
+            background-color 0s var(--duration-slower),
+            color var(--duration-base) var(--easing-opacity) var(--duration-fast);
+        }
+        .cta:hover .ic,
+        .cta:focus-visible .ic {
+          transform: translate(var(--s-2), calc(var(--s-2) * -1));
+        }
+        .card:hover {
+          background-color: var(--color-bg-surface-hover);
+        }
+        .card:hover .ic {
+          color: var(--color-content-accent);
+          transform: translate(var(--s-2), calc(var(--s-2) * -1));
+        }
+        .net:hover {
+          color: var(--color-content-primary);
+        }
+        .net:hover .net__disc {
+          background-color: var(--color-bg-round-hover);
+        }
+      }
+      .card:focus-visible {
+        background-color: var(--color-bg-surface-hover);
+      }
+      .net:focus-visible {
+        color: var(--color-content-primary);
+      }
+      .net:focus-visible .net__disc {
+        background-color: var(--color-bg-round-hover);
+      }
+
+      /* ══ Very narrow phones (320–359): the diary label keeps one line by dropping one type step; avatars,
+   round buttons and the rows' arrows drop one size step and the rows take the minimum 12-px padding,
+   so «Spenfold — семейный» (glued, 167.5 px) still fits its column; the row of networks borrows 8 px
+   from each gutter so «Instagram*» keeps air on both sides ══ */
+      @media (max-width: 359px) {
+        :root {
+          --size-avatar: var(--s-40);
+          --size-round: var(--s-48);
+          --size-card-icon: var(--s-20);
+        }
+        .cta {
+          font-size: var(--f-16);
+          line-height: var(--lh-24);
+        }
+        .card {
+          column-gap: var(--s-12);
+          padding-inline: var(--s-12);
+        }
+        .nets__list {
+          margin-inline: calc(var(--s-8) * -1);
+        }
+        .net__label {
+          letter-spacing: -0.02em;
+        }
+      }
+
+      /* ══ From 600 px: one centred column; the photo no longer bleeds, text lines up with its edge ══ */
+      @media (min-width: 600px) {
+        .page {
+          padding: var(--space-gutter) max(var(--space-gutter), (100% - var(--size-plate)) / 2) 0;
+        }
+        .hero {
+          padding-inline: 0;
+        }
+        .side {
+          padding-inline: 0;
+          padding-top: var(--s-32);
+        }
+        .name {
+          font-size: var(--f-56);
+          line-height: var(--lh-60);
+        }
+        .bio {
+          margin-top: var(--s-12);
+          font-size: var(--f-28);
+          line-height: var(--lh-36);
+        }
+        :root {
+          --space-photo-reserve: var(--s-384);
+        }
+      }
+
+      /* ══ Desktop: the photo and the column side by side, the pair centred in the window. The photo's top edge
+   and the cap of «T» share one line: the name's line box starts 9.8 px above its cap (Rubik 56/60,
+   measured), so the name moves up by 10 ══ */
+      @media (min-width: 900px) {
+        .page {
+          display: grid;
+          grid-template-columns: var(--size-photo) minmax(0, var(--size-panel));
+          column-gap: var(--space-columns);
+          justify-content: center;
+          align-content: center;
+          align-items: start;
+          min-height: 100vh;
+          min-height: 100svh;
+          padding: var(--s-64) var(--space-gutter);
+        }
+        .photo {
+          max-height: none;
+        }
+        .side {
+          padding: 0;
+        }
+        .name {
+          margin-top: calc(var(--s-10) * -1);
+        }
+        .foot {
+          padding-bottom: 0;
+        }
+      }
+
+      /* ══ One entrance: the photo, then the column top to bottom, 50 ms apart. Opacity and movement run
+   on their own curves. Fill is «backwards» on purpose: once the entrance ends nothing is held, so the
+   buttons' own press and hover transforms are never overridden. Nothing moves when motion is reduced ══ */
+      @media (prefers-reduced-motion: no-preference) {
+        .enter {
+          animation:
+            enter-fade var(--duration-slower) var(--easing-opacity) backwards,
+            enter-rise var(--duration-slower) var(--easing-decelerate) backwards;
+          animation-delay: calc(var(--i, 0) * var(--motion-stagger));
+        }
+        .photo img {
+          animation:
+            enter-fade var(--duration-slower) var(--easing-opacity) backwards,
+            enter-settle var(--duration-slower) var(--easing-decelerate) backwards;
+        }
+        @keyframes enter-fade {
+          from {
+            opacity: 0;
+          }
+        }
+        @keyframes enter-rise {
+          from {
+            transform: translateY(var(--s-12));
+          }
+        }
+        @keyframes enter-settle {
+          from {
+            transform: scale(1.03);
+          }
+        }
+      }
+    </style>
+  </head>
+  <body ontouchstart="">
+    <div class="page">
+      <header class="hero">
+        <picture class="photo">
+          <source type="image/webp" srcset="assets/liza-portrait.webp" />
+          <img
+            src="assets/liza-portrait.jpg"
+            width="1087"
+            height="1446"
+            fetchpriority="high"
+            decoding="async"
+            alt="Елизавета в круге тёплого оранжевого света"
+          />
+        </picture>
+      </header>
+
+      <div class="side">
+        <main>
+          <h1 class="name enter" style="--i: 1">Elizabeth Astor</h1>
+          <p class="bio enter" style="--i: 2">
+            <b>Превращаю твою историю в&nbsp;мультик.</b> Для блога, подарка или&nbsp;рекламы. И&nbsp;учу делать такие&nbsp;же.
+          </p>
+
+          <a class="cta enter" style="--i: 3" href="https://t.me/elizaastor_ai_bot?start=linkpage">
+            <span>Заказать или&nbsp;научиться</span>
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 17 17 7M9 7h8v8" />
+            </svg>
+          </a>
+
+          <ul class="links" role="list">
+            <li class="enter" style="--i: 4">
+              <a class="card" href="https://www.instagram.com/_assstor__/" rel="me" aria-describedby="note-meta">
+                <picture class="card__avatar">
+                  <source type="image/webp" srcset="assets/liza-avatar.webp" />
+                  <img src="assets/liza-avatar.jpg" width="48" height="48" alt="" decoding="async" />
+                </picture>
+                <span class="card__text">
+                  <span class="card__title">Смотреть мои мультики в&nbsp;Instagram*</span>
+                  <span class="card__meta">@_assstor__</span>
+                </span>
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 17 17 7M9 7h8v8" />
+                </svg>
+              </a>
+            </li>
+            <li class="enter" style="--i: 5">
+              <a class="card" href="https://elizabeth-astor.github.io/portfolio/" rel="me">
+                <picture class="card__avatar">
+                  <source type="image/webp" srcset="assets/portfolio-thumb.webp" />
+                  <img src="assets/portfolio-thumb.jpg" width="48" height="48" alt="" decoding="async" />
+                </picture>
+                <span class="card__text">
+                  <span class="card__title">Портфолио: карточки для&nbsp;Wildberries и&nbsp;Ozon</span>
+                  <span class="card__meta">elizabeth-astor.github.io/portfolio</span>
+                </span>
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 17 17 7M9 7h8v8" />
+                </svg>
+              </a>
+            </li>
+            <li class="enter" style="--i: 6">
+              <a class="card" href="https://t.me/KompaniyetsL" rel="me">
+                <picture class="card__avatar">
+                  <source type="image/webp" srcset="assets/liza-avatar.webp" />
+                  <img src="assets/liza-avatar.jpg" width="48" height="48" alt="" decoding="async" />
+                </picture>
+                <span class="card__text">
+                  <span class="card__title">Написать мне</span>
+                  <span class="card__meta">@KompaniyetsL</span>
+                </span>
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 17 17 7M9 7h8v8" />
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </main>
+
+        <footer class="foot enter" style="--i: 7">
+          <p class="foot__note" id="note-meta">
+            *&nbsp;Instagram принадлежит компании Meta, признанной экстремистской и&nbsp;запрещённой
+            в&nbsp;России.
+          </p>
+          <p class="foot__copy">©&nbsp;2026 Elizabeth Astor</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
